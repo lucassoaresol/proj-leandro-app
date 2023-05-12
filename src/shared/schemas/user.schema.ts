@@ -32,6 +32,7 @@ export const userCreateSchema = z
     repeat_password: z
       .string({ required_error: "Confirmar senha obrigatória" })
       .nonempty("Confirmar senha obrigatória"),
+    is_default: z.boolean().default(false),
     department: z.object(
       { id: z.number(), label: z.string(), name: z.string().optional() },
       {
