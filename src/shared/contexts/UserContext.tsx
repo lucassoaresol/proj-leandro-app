@@ -6,6 +6,7 @@ import {
   useState,
 } from "react";
 import {
+  iAcceptUser,
   iChildren,
   iDepartment,
   iDepartmentPositionData,
@@ -32,6 +33,7 @@ interface iUserContextData {
   createDepart: (data: iDepartmentRequest) => Promise<void>;
   createPosition: (data: iPositionRequest) => Promise<void>;
   userData: iUser | undefined;
+  acceptUserData: iAcceptUser[] | undefined;
   departments: iDepartmentPositionData[] | undefined;
   positions: iDepartmentPositionData[] | undefined;
   loadingDepartments: boolean;
@@ -39,9 +41,11 @@ interface iUserContextData {
   openDepart: boolean;
   openPosition: boolean;
   openUser: boolean;
+  openAcceptUser: boolean;
   handleOpenDepart: () => void;
   handleOpenPosition: () => void;
   handleOpenUser: () => void;
+  handleOpenAcceptUser: () => void;
 }
 
 const UserContext = createContext({} as iUserContextData);
@@ -49,6 +53,7 @@ const UserContext = createContext({} as iUserContextData);
 export const UserProvider = ({ children }: iChildren) => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState<iUser>();
+  const [acceptUserData, setAcceptUserData] = useState<iAcceptUser[]>();
   const [departments, setDepartments] = useState<iDepartmentPositionData[]>();
   const [positions, setPositions] = useState<iDepartmentPositionData[]>();
   const [loadingDepartments, setLoadingDepartments] = useState(true);
@@ -56,9 +61,11 @@ export const UserProvider = ({ children }: iChildren) => {
   const [openDepart, setOpenDepart] = useState(false);
   const [openPosition, setOpenPosition] = useState(false);
   const [openUser, setOpenUser] = useState(false);
+  const [openAcceptUser, setOpenAcceptUser] = useState(false);
   const handleOpenDepart = () => setOpenDepart(!openDepart);
   const handleOpenPosition = () => setOpenPosition(!openPosition);
   const handleOpenUser = () => setOpenUser(!openUser);
+  const handleOpenAcceptUser = () => setOpenAcceptUser(!openAcceptUser);
 
   useEffect(() => {
     apiUsingNow.get<{ results: iDepartment[] }>("departments/").then((res) => {
@@ -102,6 +109,18 @@ export const UserProvider = ({ children }: iChildren) => {
       setLoadingPositions(false);
     });
   }, [openUser]);
+
+  useEffect(() => {
+    apiUsingNowWithToken
+      .get<{ results: iUser[] }>("users/?is_active=false&is_expired=false")
+      .then((res) => {
+        setAcceptUserData(
+          res.data.results.map((el) => {
+            return { ...el, label: el.username };
+          })
+        );
+      });
+  }, [openAcceptUser]);
 
   const handleCreateUser = useCallback(async (data: iUserRequest) => {
     try {
@@ -166,6 +185,9 @@ export const UserProvider = ({ children }: iChildren) => {
         openUser,
         createDepart: handleCreateDepart,
         createPosition: handleCreatePosition,
+        openAcceptUser,
+        handleOpenAcceptUser,
+        acceptUserData,
       }}
     >
       {children}

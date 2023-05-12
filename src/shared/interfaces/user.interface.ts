@@ -50,3 +50,7 @@ export interface iUser {
   department: iDepartment;
   position: iPosition;
 }
+
+export interface iAcceptUser extends iUser {
+  label: string;
+}

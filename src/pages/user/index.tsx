@@ -1,9 +1,4 @@
-import {
-  Description,
-  PersonAdd,
-  AddBusiness,
-  Class,
-} from "@mui/icons-material";
+import { PersonAdd, AddBusiness, Class, HowToReg } from "@mui/icons-material";
 import {
   Box,
   Card,
@@ -14,10 +9,15 @@ import {
 } from "@mui/material";
 import { CreateUser, CreateDepart, CreatePosition } from "./create";
 import { useUserContext } from "../../shared/contexts";
+import { AcceptUser } from "./AcceptUser";
 
 export const User = () => {
-  const { handleOpenDepart, handleOpenPosition, handleOpenUser } =
-    useUserContext();
+  const {
+    handleOpenDepart,
+    handleOpenPosition,
+    handleOpenUser,
+    handleOpenAcceptUser,
+  } = useUserContext();
   return (
     <>
       <Container
@@ -97,9 +97,12 @@ export const User = () => {
               alignItems: "center",
             }}
           >
-            <CardContent sx={{ display: "flex", gap: 2, cursor: "pointer" }}>
-              <Description />
-              <Typography>Gestão de Planos</Typography>
+            <CardContent
+              onClick={handleOpenAcceptUser}
+              sx={{ display: "flex", gap: 2, cursor: "pointer" }}
+            >
+              <HowToReg />
+              <Typography>Aceitar Usuário</Typography>
             </CardContent>
           </Card>
         </Box>
@@ -107,6 +110,7 @@ export const User = () => {
       <CreateDepart />
       <CreatePosition />
       <CreateUser />
+      <AcceptUser />
     </>
   );
 };
