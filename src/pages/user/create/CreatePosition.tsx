@@ -2,11 +2,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Box, Button, Container, Paper } from "@mui/material";
 import { FormContainer, TextFieldElement } from "react-hook-form-mui";
 import { ModalGeneral } from "../../../shared/components";
-import { useUserContext } from "../../../shared/contexts";
+import { useModalContext, useUserContext } from "../../../shared/contexts";
 import { createPositionSchema } from "../../../shared/schemas";
 
 export const CreatePosition = () => {
-  const { createPosition, handleOpenPosition, openPosition } = useUserContext();
+  const { createPosition } = useUserContext();
+  const { handleOpenPosition, openPosition } = useModalContext();
   return (
     <ModalGeneral open={openPosition} handleClose={handleOpenPosition}>
       <Container

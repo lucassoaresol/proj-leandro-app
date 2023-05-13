@@ -6,8 +6,8 @@ import {
   RadioButtonGroup,
   TextFieldElement,
 } from "react-hook-form-mui";
-import { useUserContext } from "../../../shared/contexts";
-import { ModalGeneral } from "../../../shared/components";
+import { useModalContext, useUserContext } from "../../../shared/contexts";
+import { ModalGeneral, ValidateUsername } from "../../../shared/components";
 import { userAdminCreateSchema } from "../../../shared/schemas";
 
 export const CreateUser = () => {
@@ -17,9 +17,8 @@ export const CreateUser = () => {
     loadingDepartments,
     loadingPositions,
     positions,
-    openUser,
-    handleOpenUser,
   } = useUserContext();
+  const { openUser, handleOpenUser } = useModalContext();
   return (
     <ModalGeneral open={openUser} handleClose={handleOpenUser}>
       <Container
@@ -55,6 +54,7 @@ export const CreateUser = () => {
                 required
                 fullWidth
               />
+              <ValidateUsername />
               <RadioButtonGroup
                 label="Tipo do Usuário"
                 name="role"

@@ -10,9 +10,11 @@ import { iChildren, iLoginRequest } from "../interfaces";
 import { postUser } from "../services";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useModalProfileContext } from "./ModalProfileContext";
 
 interface iAuthContextData {
   logout: () => void;
+  accessToken: string | undefined;
   isAuthenticated: boolean;
   login: (data: iLoginRequest) => Promise<void>;
 }
@@ -21,6 +23,7 @@ const AuthContext = createContext({} as iAuthContextData);
 
 export const AuthProvider = ({ children }: iChildren) => {
   const navigate = useNavigate();
+  const { setAnchorEl } = useModalProfileContext();
   const [accessToken, setAccessToken] = useState<string>();
 
   useEffect(() => {
@@ -48,6 +51,8 @@ export const AuthProvider = ({ children }: iChildren) => {
   const handleLogout = useCallback(() => {
     localStorage.removeItem("@ProjLeandro:token");
     setAccessToken(undefined);
+    setAnchorEl(null);
+    navigate("/login");
   }, []);
 
   const isAuthenticated = useMemo(() => !!accessToken, [accessToken]);
@@ -58,6 +63,7 @@ export const AuthProvider = ({ children }: iChildren) => {
         isAuthenticated,
         login: handleLogin,
         logout: handleLogout,
+        accessToken,
       }}
     >
       {children}

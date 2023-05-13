@@ -9,22 +9,14 @@ const localApi = axios.create({
   timeout: 5000,
 });
 
-export const localApiToken = axios.create({
-  baseURL: localServer,
-  timeout: 5000,
-  headers: { Authorization: `Bearer ${token}` },
-});
-
 const apiServerSide = axios.create({
   baseURL: serverUrl,
   timeout: 10000,
 });
 
-export const apiServerSideToken = axios.create({
-  baseURL: serverUrl,
-  timeout: 10000,
-  headers: { Authorization: `Bearer ${token}` },
-});
+if (token) {
+  localApi.defaults.headers.authorization = `Bearer ${token}`;
+  apiServerSide.defaults.headers.authorization = `Bearer ${token}`;
+}
 
 export const apiUsingNow = localApi;
-export const apiUsingNowWithToken = localApiToken;

@@ -7,6 +7,7 @@ import {
 } from "react";
 import {
   iAcceptUser,
+  iAcceptUserRequest,
   iChildren,
   iDepartment,
   iDepartmentPositionData,
@@ -15,57 +16,59 @@ import {
   iPositionRequest,
   iUser,
   iUserAdminRequest,
+  iUserIsDefaultRequest,
+  iUserPasswordRequest,
   iUserRequest,
+  iUserUpdateRequest,
 } from "../interfaces";
 import {
   apiUsingNow,
-  apiUsingNowWithToken,
+  patchUser,
   postUserCreate,
   postUserCreateDepart,
   postUserCreatePosition,
 } from "../services";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useAuthContext, useModalContext, useModalProfileContext } from ".";
 
 interface iUserContextData {
   create: (data: iUserRequest) => Promise<void>;
   createUser: (data: iUserAdminRequest) => Promise<void>;
   createDepart: (data: iDepartmentRequest) => Promise<void>;
   createPosition: (data: iPositionRequest) => Promise<void>;
+  acceptUser: (data: iAcceptUserRequest) => void;
+  editPassword: (id: number, data: iUserPasswordRequest) => Promise<void>;
+  isDefaultUser: (id: number, data: iUserIsDefaultRequest) => Promise<void>;
+  updateUser: (id: number, data: iUserUpdateRequest) => Promise<void>;
   userData: iUser | undefined;
   acceptUserData: iAcceptUser[] | undefined;
   departments: iDepartmentPositionData[] | undefined;
   positions: iDepartmentPositionData[] | undefined;
   loadingDepartments: boolean;
   loadingPositions: boolean;
-  openDepart: boolean;
-  openPosition: boolean;
-  openUser: boolean;
-  openAcceptUser: boolean;
-  handleOpenDepart: () => void;
-  handleOpenPosition: () => void;
-  handleOpenUser: () => void;
-  handleOpenAcceptUser: () => void;
 }
 
 const UserContext = createContext({} as iUserContextData);
 
 export const UserProvider = ({ children }: iChildren) => {
   const navigate = useNavigate();
+  const { accessToken } = useAuthContext();
+  const { setOpenEditProfile, setOpenEditPassword } = useModalProfileContext();
+  const {
+    openUser,
+    openAcceptUser,
+    setOpenDepart,
+    setOpenPosition,
+    setOpenUser,
+    setOpenAcceptUser,
+  } = useModalContext();
   const [userData, setUserData] = useState<iUser>();
   const [acceptUserData, setAcceptUserData] = useState<iAcceptUser[]>();
   const [departments, setDepartments] = useState<iDepartmentPositionData[]>();
   const [positions, setPositions] = useState<iDepartmentPositionData[]>();
   const [loadingDepartments, setLoadingDepartments] = useState(true);
   const [loadingPositions, setLoadingPositions] = useState(true);
-  const [openDepart, setOpenDepart] = useState(false);
-  const [openPosition, setOpenPosition] = useState(false);
-  const [openUser, setOpenUser] = useState(false);
-  const [openAcceptUser, setOpenAcceptUser] = useState(false);
-  const handleOpenDepart = () => setOpenDepart(!openDepart);
-  const handleOpenPosition = () => setOpenPosition(!openPosition);
-  const handleOpenUser = () => setOpenUser(!openUser);
-  const handleOpenAcceptUser = () => setOpenAcceptUser(!openAcceptUser);
 
   useEffect(() => {
     apiUsingNow.get<{ results: iDepartment[] }>("departments/").then((res) => {
@@ -84,12 +87,17 @@ export const UserProvider = ({ children }: iChildren) => {
       );
       setLoadingPositions(false);
     });
-    apiUsingNowWithToken
-      .get<{
-        results: [iUser];
-      }>("users/profile/")
-      .then((res) => setUserData(res.data.results[0]));
   }, []);
+
+  useEffect(() => {
+    if (accessToken) {
+      apiUsingNow
+        .get<iUser>("users/profile/", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        })
+        .then((res) => setUserData(res.data));
+    }
+  }, [accessToken]);
 
   useEffect(() => {
     apiUsingNow.get<{ results: iDepartment[] }>("departments/").then((res) => {
@@ -111,16 +119,20 @@ export const UserProvider = ({ children }: iChildren) => {
   }, [openUser]);
 
   useEffect(() => {
-    apiUsingNowWithToken
-      .get<{ results: iUser[] }>("users/?is_active=false&is_expired=false")
-      .then((res) => {
-        setAcceptUserData(
-          res.data.results.map((el) => {
-            return { ...el, label: el.username };
-          })
-        );
-      });
-  }, [openAcceptUser]);
+    if (accessToken) {
+      apiUsingNow
+        .get<{ results: iUser[] }>("users/?is_active=false&is_expired=false", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        })
+        .then((res) => {
+          setAcceptUserData(
+            res.data.results.map((el) => {
+              return { ...el, label: el.username };
+            })
+          );
+        });
+    }
+  }, [accessToken, openAcceptUser]);
 
   const handleCreateUser = useCallback(async (data: iUserRequest) => {
     try {
@@ -167,6 +179,65 @@ export const UserProvider = ({ children }: iChildren) => {
     }
   }, []);
 
+  const handleAcceptUser = useCallback(({ users }: iAcceptUserRequest) => {
+    try {
+      users.forEach(async (el) => {
+        const data = new FormData();
+        data.append("is_active", "true");
+        await patchUser(el, data);
+      });
+
+      toast.success("Conta ativada com sucesso");
+      setOpenAcceptUser(false);
+    } catch {
+      toast.error("Conta não foi possível ser ativada no momento!");
+      setOpenAcceptUser(false);
+    }
+  }, []);
+
+  const handleIsDefaultUser = useCallback(
+    async (id: number, data: iUserIsDefaultRequest) => {
+      try {
+        const user = await patchUser(id, data);
+        toast.success("Conta ativada com sucesso");
+        setUserData(user);
+        navigate("/");
+      } catch {
+        toast.error("Conta não foi possível ser ativada no momento!");
+      }
+    },
+    []
+  );
+
+  const handleUpdateUser = useCallback(
+    async (id: number, data: iUserUpdateRequest) => {
+      try {
+        const user = await patchUser(id, data);
+        toast.success("Dados alterado com sucesso");
+        setUserData(user);
+        setOpenEditProfile(false);
+      } catch {
+        toast.error("Não foi possível atualizar os dados no momento!");
+        setOpenEditProfile(false);
+      }
+    },
+    []
+  );
+
+  const handlePasswordUser = useCallback(
+    async (id: number, data: iUserPasswordRequest) => {
+      try {
+        await patchUser(id, data);
+        toast.success("Senha alterada com sucesso");
+        setOpenEditPassword(false);
+      } catch {
+        toast.error("Senha atual incorreta!");
+        setOpenEditPassword(false);
+      }
+    },
+    []
+  );
+
   return (
     <UserContext.Provider
       value={{
@@ -177,17 +248,13 @@ export const UserProvider = ({ children }: iChildren) => {
         loadingDepartments,
         loadingPositions,
         positions,
-        handleOpenDepart,
-        handleOpenPosition,
-        handleOpenUser,
-        openDepart,
-        openPosition,
-        openUser,
         createDepart: handleCreateDepart,
         createPosition: handleCreatePosition,
-        openAcceptUser,
-        handleOpenAcceptUser,
         acceptUserData,
+        acceptUser: handleAcceptUser,
+        isDefaultUser: handleIsDefaultUser,
+        updateUser: handleUpdateUser,
+        editPassword: handlePasswordUser,
       }}
     >
       {children}

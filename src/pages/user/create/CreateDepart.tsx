@@ -2,11 +2,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Box, Button, Container, Paper } from "@mui/material";
 import { FormContainer, TextFieldElement } from "react-hook-form-mui";
 import { createDepartSchema } from "../../../shared/schemas";
-import { useUserContext } from "../../../shared/contexts";
+import { useModalContext, useUserContext } from "../../../shared/contexts";
 import { ModalGeneral } from "../../../shared/components";
 
 export const CreateDepart = () => {
-  const { createDepart, handleOpenDepart, openDepart } = useUserContext();
+  const { createDepart } = useUserContext();
+  const { handleOpenDepart, openDepart } = useModalContext();
   return (
     <ModalGeneral open={openDepart} handleClose={handleOpenDepart}>
       <Container

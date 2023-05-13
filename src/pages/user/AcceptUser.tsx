@@ -1,19 +1,46 @@
-import { Box, Button, Container, Paper } from "@mui/material";
+import { Box, Button, Container, Paper, Typography } from "@mui/material";
 import { ModalGeneral } from "../../shared/components";
-import { useUserContext } from "../../shared/contexts";
-import { CheckboxButtonGroup, FormContainer } from "react-hook-form-mui";
+import { useModalContext, useUserContext } from "../../shared/contexts";
+import {
+  CheckboxButtonGroup,
+  FormContainer,
+  useFormContext,
+} from "react-hook-form-mui";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createDepartSchema } from "../../shared/schemas";
-import { useEffect, useState } from "react";
+import { acceptUserSchema } from "../../shared/schemas";
+
+const HadleValues = () => {
+  const { setValue } = useFormContext();
+  const { acceptUserData } = useUserContext();
+  if (acceptUserData?.length) {
+    return (
+      <Box display="flex" gap={2}>
+        <Button
+          onClick={() => {
+            setValue(
+              "users",
+              acceptUserData.map((el: { id: number }) => el.id)
+            );
+          }}
+        >
+          Todos
+        </Button>
+        <Button
+          onClick={() => {
+            setValue("users", []);
+          }}
+        >
+          Limpar
+        </Button>
+      </Box>
+    );
+  }
+  return <></>;
+};
 
 export const AcceptUser = () => {
-  const { acceptUserData, createDepart, handleOpenAcceptUser, openAcceptUser } =
-    useUserContext();
-  const [value, setValue] = useState<number[]>();
-
-  useEffect(() => {
-    console.log(value);
-  }, [value]);
+  const { acceptUserData, acceptUser } = useUserContext();
+  const { handleOpenAcceptUser, openAcceptUser } = useModalContext();
 
   return (
     <ModalGeneral open={openAcceptUser} handleClose={handleOpenAcceptUser}>
@@ -33,13 +60,10 @@ export const AcceptUser = () => {
           justifyContent="center"
           padding={5}
         >
-          {acceptUserData && (
+          {acceptUserData?.length ? (
             <FormContainer
-              defaultValues={{ users: value }}
-              onSuccess={(data) => {
-                console.log(data);
-              }}
-              // resolver={zodResolver(createDepartSchema)}
+              onSuccess={acceptUser}
+              resolver={zodResolver(acceptUserSchema)}
             >
               <Box
                 display="flex"
@@ -47,13 +71,7 @@ export const AcceptUser = () => {
                 alignItems="center"
                 gap={2}
               >
-                <Button
-                  onClick={() => {
-                    setValue(acceptUserData.map((el) => el.id));
-                  }}
-                >
-                  Todos
-                </Button>
+                <HadleValues />
                 <CheckboxButtonGroup
                   label="Usuários"
                   name="users"
@@ -65,6 +83,8 @@ export const AcceptUser = () => {
                 </Button>
               </Box>
             </FormContainer>
+          ) : (
+            <Typography>Nenhum usuário para aceitar no momento!</Typography>
           )}
         </Box>
       </Container>

@@ -1,5 +1,5 @@
 import { FieldValues } from "react-hook-form";
-import { apiUsingNow, apiUsingNowWithToken } from "./api";
+import { apiUsingNow } from "./api";
 import {
   iDepartment,
   iLoginRequest,
@@ -24,7 +24,7 @@ export async function postUserCreate(data: FieldValues): Promise<iUser> {
 export async function postUserCreateDepart(
   data: FieldValues
 ): Promise<iDepartment> {
-  const { data: response } = await apiUsingNowWithToken.post<iDepartment>(
+  const { data: response } = await apiUsingNow.post<iDepartment>(
     "departments/",
     data
   );
@@ -34,8 +34,19 @@ export async function postUserCreateDepart(
 export async function postUserCreatePosition(
   data: FieldValues
 ): Promise<iPosition> {
-  const { data: response } = await apiUsingNowWithToken.post<iPosition>(
+  const { data: response } = await apiUsingNow.post<iPosition>(
     "positions/",
+    data
+  );
+  return response;
+}
+
+export async function patchUser(
+  id: number,
+  data: FormData | FieldValues
+): Promise<iUser> {
+  const { data: response } = await apiUsingNow.patch<iUser>(
+    `users/${id}/`,
     data
   );
   return response;

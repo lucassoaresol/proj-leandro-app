@@ -4,20 +4,13 @@ import {
   FormContainer,
   TextFieldElement,
   PasswordElement,
-  AutocompleteElement,
 } from "react-hook-form-mui";
-import { userCreateSchema } from "../../shared/schemas";
+import { userIsDefaultSchema } from "../../shared/schemas";
 import { useUserContext } from "../../shared/contexts";
 import { ValidatePhone, ValidateUsername } from "../../shared/components";
 
-export const Register = () => {
-  const {
-    create,
-    departments,
-    loadingDepartments,
-    loadingPositions,
-    positions,
-  } = useUserContext();
+export const IsDefault = () => {
+  const { isDefaultUser, userData } = useUserContext();
 
   return (
     <Container
@@ -37,8 +30,10 @@ export const Register = () => {
         padding={5}
       >
         <FormContainer
-          onSuccess={create}
-          resolver={zodResolver(userCreateSchema)}
+          onSuccess={(data) => {
+            if (userData) isDefaultUser(userData.id, data);
+          }}
+          resolver={zodResolver(userIsDefaultSchema)}
         >
           <Box
             display="flex"
@@ -80,24 +75,6 @@ export const Register = () => {
               required
               fullWidth
             />
-            <div style={{ width: "100%" }}>
-              <AutocompleteElement
-                name="department"
-                label="Departamento"
-                loading={loadingDepartments}
-                options={departments ? departments : []}
-                required
-              />
-            </div>
-            <div style={{ width: "100%" }}>
-              <AutocompleteElement
-                name="position"
-                label="Cargo"
-                loading={loadingPositions}
-                options={positions ? positions : []}
-                required
-              />
-            </div>
             <Button variant="contained" type="submit" fullWidth>
               Enviar
             </Button>
