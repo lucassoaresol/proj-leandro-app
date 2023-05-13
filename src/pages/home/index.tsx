@@ -1,6 +1,7 @@
+import { BasePage } from "../../shared/components";
 import { useUserContext } from "../../shared/contexts";
-import { Dashboard } from "./Dashboard";
 import { DashboardAdmin } from "./DashboardAdmin";
+import { DashboardCommon } from "./DashboardCommon";
 import { DashboardManager } from "./DashboardManager";
 
 export const Home = () => {
@@ -8,13 +9,25 @@ export const Home = () => {
   if (userData) {
     switch (userData.role) {
       case "Administrator":
-        return <DashboardAdmin />;
+        return (
+          <BasePage>
+            <DashboardAdmin />
+          </BasePage>
+        );
 
       case "Manager":
-        return <DashboardManager />;
+        return (
+          <BasePage>
+            <DashboardManager />
+          </BasePage>
+        );
 
       default:
-        return <Dashboard />;
+        return (
+          <BasePage>
+            <DashboardCommon />
+          </BasePage>
+        );
     }
   }
   return <></>;
