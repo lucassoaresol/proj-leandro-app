@@ -1,4 +1,6 @@
 import {
+  Dispatch,
+  SetStateAction,
   createContext,
   useCallback,
   useContext,
@@ -6,25 +8,31 @@ import {
   useMemo,
   useState,
 } from "react";
-import { iChildren, iLoginRequest } from "../interfaces";
-import { postUser } from "../services";
+import { iChildren, iLoginRequest, iUser } from "../interfaces";
+import { apiUsingNow, postUser } from "../services";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { useModalProfileContext } from "./ModalProfileContext";
+import { useModalContext } from "./ModalContext";
+import { Backdrop, CircularProgress, useTheme } from "@mui/material";
 
 interface iAuthContextData {
   logout: () => void;
-  accessToken: string | undefined;
   isAuthenticated: boolean;
   login: (data: iLoginRequest) => Promise<void>;
+  setLoading: Dispatch<SetStateAction<boolean>>;
+  userData: iUser | undefined;
+  setUserData: Dispatch<SetStateAction<iUser | undefined>>;
 }
 
 const AuthContext = createContext({} as iAuthContextData);
 
 export const AuthProvider = ({ children }: iChildren) => {
+  const theme = useTheme();
   const navigate = useNavigate();
-  const { setAnchorEl } = useModalProfileContext();
+  const { setAnchorEl } = useModalContext();
   const [accessToken, setAccessToken] = useState<string>();
+  const [loading, setLoading] = useState(false);
+  const [userData, setUserData] = useState<iUser>();
 
   useEffect(() => {
     const accessToken = localStorage.getItem("@ProjLeandro:token");
@@ -35,6 +43,26 @@ export const AuthProvider = ({ children }: iChildren) => {
       setAccessToken(undefined);
     }
   }, []);
+
+  useEffect(() => {
+    if (accessToken) {
+      setLoading(true);
+      apiUsingNow
+        .get<iUser>("users/profile/", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        })
+        .then((res) => {
+          apiUsingNow.defaults.headers.authorization = `Bearer ${accessToken}`;
+          setUserData(res.data);
+          setLoading(false);
+        })
+        .catch(() => {
+          setAccessToken(undefined);
+          setUserData(undefined);
+          setLoading(false);
+        });
+    }
+  }, [accessToken]);
 
   const handleLogin = useCallback(async (data: iLoginRequest) => {
     try {
@@ -63,10 +91,21 @@ export const AuthProvider = ({ children }: iChildren) => {
         isAuthenticated,
         login: handleLogin,
         logout: handleLogout,
-        accessToken,
+        setLoading,
+        setUserData,
+        userData,
       }}
     >
       {children}
+      <Backdrop
+        sx={{
+          color: theme.palette.secondary.main,
+          zIndex: theme.zIndex.drawer + 1,
+        }}
+        open={loading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </AuthContext.Provider>
   );
 };

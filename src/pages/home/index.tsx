@@ -1,33 +1,20 @@
-import { BasePage } from "../../shared/components";
-import { useUserContext } from "../../shared/contexts";
+import { useAuthContext } from "../../shared/contexts";
 import { DashboardAdmin } from "./DashboardAdmin";
 import { DashboardCommon } from "./DashboardCommon";
 import { DashboardManager } from "./DashboardManager";
 
 export const Home = () => {
-  const { userData } = useUserContext();
+  const { userData } = useAuthContext();
   if (userData) {
     switch (userData.role) {
       case "Administrator":
-        return (
-          <BasePage>
-            <DashboardAdmin />
-          </BasePage>
-        );
+        return <DashboardAdmin />;
 
       case "Manager":
-        return (
-          <BasePage>
-            <DashboardManager />
-          </BasePage>
-        );
+        return <DashboardManager />;
 
       default:
-        return (
-          <BasePage>
-            <DashboardCommon />
-          </BasePage>
-        );
+        return <DashboardCommon />;
     }
   }
   return <></>;

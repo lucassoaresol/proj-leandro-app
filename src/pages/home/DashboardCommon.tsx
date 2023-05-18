@@ -1,3 +1,5 @@
+import { BasePage } from "../../shared/components";
+
 export const DashboardCommon = () => {
-  return <div>Dashboard</div>;
+  return <BasePage isProfile>Dashboard</BasePage>;
 };

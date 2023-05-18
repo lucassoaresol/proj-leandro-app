@@ -1,2 +1,3 @@
 export * from "./global.interfaces";
-export * from "./user.interface";
+export * from "./scheme.interfaces";
+export * from "./user.interfaces";

@@ -1,10 +1,11 @@
 import { Card, CardContent, Typography } from "@mui/material";
 import { People, Description } from "@mui/icons-material";
 import { Link } from "react-router-dom";
+import { BasePage } from "../../shared/components";
 
 export const DashboardAdmin = () => {
   return (
-    <>
+    <BasePage isProfile>
       <Card
         sx={{
           width: "100%",
@@ -32,11 +33,13 @@ export const DashboardAdmin = () => {
           alignItems: "center",
         }}
       >
-        <CardContent sx={{ display: "flex", gap: 2, cursor: "pointer" }}>
-          <Description />
-          <Typography>Gestão de Planos</Typography>
-        </CardContent>
+        <Link to="/scheme">
+          <CardContent sx={{ display: "flex", gap: 2, cursor: "pointer" }}>
+            <Description />
+            <Typography>Gestão de Planos</Typography>
+          </CardContent>
+        </Link>
       </Card>
-    </>
+    </BasePage>
   );
 };

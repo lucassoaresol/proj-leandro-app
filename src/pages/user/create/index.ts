@@ -1,3 +1,3 @@
-export * from "./CreateDepart";
-export * from "./CreatePosition";
-export * from "./CreateUser";
+export * from "./Depart";
+export * from "./Position";
+export * from "./User";

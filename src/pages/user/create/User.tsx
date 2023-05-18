@@ -1,28 +1,31 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  FormContainer,
-  TextFieldElement,
-  PasswordElement,
   AutocompleteElement,
+  FormContainer,
+  RadioButtonGroup,
+  TextFieldElement,
 } from "react-hook-form-mui";
-import { userCreateSchema } from "../../shared/schemas";
-import { useUserContext } from "../../shared/contexts";
+import { useUserContext } from "../../../shared/contexts";
 import {
   BasePage,
   BoxResp,
-  ValidatePhone,
   ValidateUsername,
-} from "../../shared/components";
+} from "../../../shared/components";
+import { userAdminCreateSchema } from "../../../shared/schemas";
 import { useEffect, useState } from "react";
 import {
   iDepartment,
   iDepartmentPositionData,
   iPosition,
-} from "../../shared/interfaces";
-import { apiUsingNow } from "../../shared/services";
+} from "../../../shared/interfaces";
+import { apiUsingNow } from "../../../shared/services";
 
-export const Register = () => {
-  const { create } = useUserContext();
+interface iCreateUserProps {
+  back: string;
+}
+
+export const CreateUser = ({ back }: iCreateUserProps) => {
+  const { createUser } = useUserContext();
   const [departments, setDepartments] = useState<iDepartmentPositionData[]>();
   const [positions, setPositions] = useState<iDepartmentPositionData[]>();
   const [loadingDepartments, setLoadingDepartments] = useState(true);
@@ -48,35 +51,38 @@ export const Register = () => {
   }, []);
 
   return (
-    <BasePage>
+    <BasePage isProfile back={back}>
       <FormContainer
-        onSuccess={create}
-        resolver={zodResolver(userCreateSchema)}
+        onSuccess={createUser}
+        defaultValues={{ role: "Common" }}
+        resolver={zodResolver(userAdminCreateSchema)}
       >
         <BoxResp>
-          <TextFieldElement name="first_name" label="Nome" required fullWidth />
-          <TextFieldElement
-            name="last_name"
-            label="Sobrenome"
-            required
-            fullWidth
-          />
-          <TextFieldElement name="email" label="Email" required fullWidth />
-          <TextFieldElement name="phone" label="Telefone" required fullWidth />
-          <ValidatePhone />
           <TextFieldElement
             name="username"
             label="Username"
             required
             fullWidth
           />
-
-          <PasswordElement name="password" label="Senha" required fullWidth />
-          <PasswordElement
-            name="repeat_password"
-            label="Confirmar Senha"
+          <RadioButtonGroup
+            label="Tipo do Usuário"
+            name="role"
+            options={[
+              {
+                id: "Administrator",
+                label: "Administrador",
+              },
+              {
+                id: "Manager",
+                label: "Gerente",
+              },
+              {
+                id: "Common",
+                label: "Comum",
+              },
+            ]}
+            row
             required
-            fullWidth
           />
           <div style={{ width: "100%" }}>
             <AutocompleteElement

@@ -56,7 +56,7 @@ export const userCreateSchema = z
   .refine((fields) => (fields.department.name = fields.department.label))
   .refine((fields) => (fields.position.name = fields.position.label));
 
-export const userIsDefaultSchema = z
+export const userFirstSchema = z
   .object({
     first_name: z
       .string({ required_error: "Nome obrigatório" })
@@ -79,7 +79,7 @@ export const userIsDefaultSchema = z
     repeat_password: z
       .string({ required_error: "Confirmar senha obrigatória" })
       .nonempty("Confirmar senha obrigatória"),
-    is_default: z.boolean().default(false),
+    is_first_access: z.boolean().default(true),
   })
   .refine((fields) => fields.password === fields.repeat_password, {
     path: ["repeat_password"],

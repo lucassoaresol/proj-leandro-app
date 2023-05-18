@@ -1,6 +1,6 @@
-import { Box, Button, Container, Paper, Typography } from "@mui/material";
-import { ModalGeneral } from "../../shared/components";
-import { useModalContext, useUserContext } from "../../shared/contexts";
+import { Box, Button, Typography } from "@mui/material";
+import { BasePage, BoxResp } from "../../shared/components";
+import { useUserContext } from "../../shared/contexts";
 import {
   CheckboxButtonGroup,
   FormContainer,
@@ -38,56 +38,36 @@ const HadleValues = () => {
   return <></>;
 };
 
-export const AcceptUser = () => {
+interface iAcceptUserProps {
+  back: string;
+}
+
+export const AcceptUser = ({ back }: iAcceptUserProps) => {
   const { acceptUserData, acceptUser } = useUserContext();
-  const { handleOpenAcceptUser, openAcceptUser } = useModalContext();
 
   return (
-    <ModalGeneral open={openAcceptUser} handleClose={handleOpenAcceptUser}>
-      <Container
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          paddingTop: 3,
-          paddingBottom: 3,
-        }}
-      >
-        <Box
-          component={Paper}
-          width="100vw"
-          maxWidth={400}
-          display="flex"
-          justifyContent="center"
-          padding={5}
+    <BasePage isProfile back={back}>
+      {acceptUserData?.length ? (
+        <FormContainer
+          onSuccess={acceptUser}
+          resolver={zodResolver(acceptUserSchema)}
         >
-          {acceptUserData?.length ? (
-            <FormContainer
-              onSuccess={acceptUser}
-              resolver={zodResolver(acceptUserSchema)}
-            >
-              <Box
-                display="flex"
-                flexDirection="column"
-                alignItems="center"
-                gap={2}
-              >
-                <HadleValues />
-                <CheckboxButtonGroup
-                  label="Usuários"
-                  name="users"
-                  options={acceptUserData}
-                  required
-                />
-                <Button variant="contained" type="submit" fullWidth>
-                  Enviar
-                </Button>
-              </Box>
-            </FormContainer>
-          ) : (
-            <Typography>Nenhum usuário para aceitar no momento!</Typography>
-          )}
-        </Box>
-      </Container>
-    </ModalGeneral>
+          <BoxResp>
+            <HadleValues />
+            <CheckboxButtonGroup
+              label="Usuários"
+              name="users"
+              options={acceptUserData}
+              required
+            />
+            <Button variant="contained" type="submit" fullWidth>
+              Enviar
+            </Button>
+          </BoxResp>
+        </FormContainer>
+      ) : (
+        <Typography>Nenhum usuário para aceitar no momento!</Typography>
+      )}
+    </BasePage>
   );
 };

@@ -1,5 +1,14 @@
+import { Close } from "@mui/icons-material";
 import { iChildren } from "../../interfaces";
-import { Backdrop, Box, Fade, Modal } from "@mui/material";
+import {
+  Backdrop,
+  Box,
+  Container,
+  Fade,
+  IconButton,
+  Modal,
+  Paper,
+} from "@mui/material";
 
 interface iModalGeneralProps extends iChildren {
   open: boolean;
@@ -39,7 +48,38 @@ export const ModalGeneral = ({
             p: 4,
           }}
         >
-          {children}
+          <Container
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              paddingTop: 3,
+              paddingBottom: 3,
+            }}
+          >
+            <Box
+              component={Paper}
+              width="100vw"
+              maxWidth={400}
+              display="flex"
+              justifyContent="center"
+              padding={5}
+            >
+              {handleClose && (
+                <IconButton
+                  aria-label="close"
+                  onClick={handleClose}
+                  sx={{
+                    position: "absolute",
+                    right: 8,
+                    top: 8,
+                  }}
+                >
+                  <Close />
+                </IconButton>
+              )}
+              {children}
+            </Box>
+          </Container>
         </Box>
       </Fade>
     </Modal>

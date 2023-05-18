@@ -1,21 +1,21 @@
 import { iChildren } from "../interfaces";
 import { AuthProvider } from "./AuthContext";
 import { ModalProvider } from "./ModalContext";
-import { ModalProfileProvider } from "./ModalProfileContext";
+import { SchemeProvider } from "./SchemeContext";
 import { UserProvider } from "./UserContext";
 
 const Providers = ({ children }: iChildren) => (
-  <ModalProfileProvider>
-    <ModalProvider>
-      <AuthProvider>
-        <UserProvider>{children}</UserProvider>
-      </AuthProvider>
-    </ModalProvider>
-  </ModalProfileProvider>
+  <ModalProvider>
+    <AuthProvider>
+      <UserProvider>
+        <SchemeProvider>{children}</SchemeProvider>
+      </UserProvider>
+    </AuthProvider>
+  </ModalProvider>
 );
 
 export default Providers;
 export { useAuthContext } from "./AuthContext";
 export { useModalContext } from "./ModalContext";
-export { useModalProfileContext } from "./ModalProfileContext";
+export { useSchemeContext } from "./SchemeContext";
 export { useUserContext } from "./UserContext";

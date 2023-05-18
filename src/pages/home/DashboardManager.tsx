@@ -1,3 +1,5 @@
+import { BasePage } from "../../shared/components";
+
 export const DashboardManager = () => {
-  return <div>DashboardManager</div>;
+  return <BasePage isProfile>DashboardManager</BasePage>;
 };

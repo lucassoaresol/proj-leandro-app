@@ -6,7 +6,7 @@ import {
   loginSchema,
   userAdminCreateSchema,
   userCreateSchema,
-  userIsDefaultSchema,
+  userFirstSchema,
   userPasswordSchema,
   userUpdateSchema,
 } from "../schemas";
@@ -34,11 +34,16 @@ export type iPositionRequest = z.infer<typeof createPositionSchema>;
 export interface iPosition {
   id: number;
   name: string;
+  departments: iDepartment[];
+}
+
+export interface iPositionData extends iPosition {
+  label: string;
 }
 
 export type iUserRequest = z.infer<typeof userCreateSchema>;
 
-export type iUserIsDefaultRequest = z.infer<typeof userIsDefaultSchema>;
+export type iUserIsDefaultRequest = z.infer<typeof userFirstSchema>;
 
 export type iUserUpdateRequest = z.infer<typeof userUpdateSchema>;
 
@@ -48,6 +53,8 @@ export type iUserAdminRequest = z.infer<typeof userAdminCreateSchema>;
 
 export type iAcceptUserRequest = z.infer<typeof acceptUserSchema>;
 
+export type iRole = "Administrator" | "Manager" | "Common";
+
 export interface iUser {
   id: number;
   username: string;
@@ -55,9 +62,10 @@ export interface iUser {
   last_name: string;
   email: string;
   phone: string;
-  role: "Administrator" | "Manager" | "Common";
+  role: iRole;
   is_active: boolean;
-  is_default: boolean;
+  is_first_access: boolean;
+  is_expired: boolean;
   date_joined: Date;
   date_expired?: Date;
   department: iDepartment;

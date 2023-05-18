@@ -1,16 +1,18 @@
 import { useEffect } from "react";
 import { useFormContext } from "react-hook-form-mui";
 import { apiUsingNow } from "../../services";
-import { useUserContext } from "../../contexts";
+import { useAuthContext } from "../../contexts";
+import { Button } from "@mui/material";
 
 interface iValidateUsernameProps {
   isProfile?: boolean;
 }
 
 export const ValidateUsername = ({ isProfile }: iValidateUsernameProps) => {
-  const { watch, setError, clearErrors } = useFormContext();
-  const { userData } = useUserContext();
+  const { watch, setError, clearErrors, formState } = useFormContext();
+  const { userData } = useAuthContext();
   const username = watch("username");
+  const { isValid } = formState;
 
   useEffect(() => {
     apiUsingNow.get(`/users/username/${username}/`).then((res) => {
@@ -28,5 +30,9 @@ export const ValidateUsername = ({ isProfile }: iValidateUsernameProps) => {
       }
     });
   }, [username]);
-  return <></>;
+  return (
+    <Button variant="contained" type="submit" disabled={!isValid} fullWidth>
+      Enviar
+    </Button>
+  );
 };
