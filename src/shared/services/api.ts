@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const token = localStorage.getItem("@ProjLeandro:token");
-const serverUrl = "https://proj-leandro.vercel.app/api";
+const serverUrl = "https://proj-leandro-production.up.railway.app/api";
 const localServer = "http://127.0.0.1:8000/api";
 
 const localApi = axios.create({
